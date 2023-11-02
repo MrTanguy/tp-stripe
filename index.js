@@ -38,3 +38,37 @@ app.post('/create-checkout-session', async (req, res) => {
     res.json({ sessionId: session.id });
 });
 
+
+app.get('/dashboard', async (req, res) => {
+    // Récupérez les informations sur le compte Stripe (solde)
+    const account = await stripe.accounts.retrieve();
+
+    // Récupérez la liste des paiements
+    const payments = await stripe.paymentIntents.list();
+
+    res.render('dashboard', { account, payments });
+});
+
+app.get('/get-stripe-balance', (req, res) => {
+
+    stripe.balance.retrieve()
+        .then(balance => {
+            res.json(balance);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération du solde Stripe', error);
+            res.status(500).json({ error: 'Erreur lors de la récupération du solde Stripe' });
+        });
+});
+
+app.get('/list-stripe-payments', (req, res) => {
+
+    stripe.paymentIntents.list()
+        .then(payments => {
+            res.json(payments);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des paiements Stripe', error);
+            res.status(500).json({ error: 'Erreur lors de la récupération des paiements Stripe' });
+        });
+});
